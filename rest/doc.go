@@ -157,4 +157,21 @@
 //
 // Or by programmatically starting the mockup server
 // 	StartMockupServer()
+// An example
+//  myURL := "http://mytest.com/foo"
+//
+//  myHeaders := make(http.Header)
+//  myHeaders.Add("Hello", "world")
+//
+//  mock := rest.Mock{
+//    URL:          myURL,
+//  	HTTPMethod:   http.MethodGet,
+//  	ReqHeaders:   myHeaders,
+//  	RespHTTPCode: http.StatusOK,
+//  	RespBody:     "foo",
+//  }
+//
+//  rest.AddMockups(&mock)
+//
+//  v := rest.Get(myURL)
 package rest
