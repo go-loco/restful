@@ -16,7 +16,7 @@ var mux *http.ServeMux
 var mockServerURL *url.URL
 
 // Mock serves the purpose of creating Mockups.
-// All requests will be send to the mockup server if mockup is activated.
+// All requests will be sent to the mockup server if mockup is activated.
 // To activate the mockup *environment* you have two ways: using the flag -mock
 //	go test -mock
 //

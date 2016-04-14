@@ -149,10 +149,9 @@
 //
 //  resp := rb.Get("/mypath")
 //
-// Mockup
+// Mockups
 //
-// Mock serves the purpose of creating Mockups.
-// All requests will be send to the mockup server if mockup is activated.
+// When using mockups, all requests will be sent to the mockup server.
 // To activate the mockup *environment* you have two ways: using the flag -mock
 //	go test -mock
 //

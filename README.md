@@ -169,9 +169,8 @@ var rb = rest.RequestBuilder{
 resp := rb.Get("/mypath")
 ```
 
-### Mockup
-Mock serves the purpose of creating Mockups.
-All requests will be send to the mockup server if mockup is activated.
+### Mockups
+When using mockups all requests will be sent to the mockup server.
 To activate the mockup *environment* you have two ways: using the flag -mock
 ```
 go test -mock
@@ -180,4 +179,24 @@ go test -mock
 Or by programmatically starting the mockup server
 ```
 StartMockupServer()
+```
+#### A mockup example
+```go
+myURL := "http://mytest.com/foo"
+
+myHeaders := make(http.Header)
+myHeaders.Add("Hello", "world")
+
+mock := rest.Mock{
+	URL:          myURL,
+	HTTPMethod:   http.MethodGet,
+	ReqHeaders:   myHeaders,
+	RespHTTPCode: http.StatusOK,
+	RespBody:     "foo",
+}
+
+rest.AddMockups(&mock)
+
+v := rest.Get(myURL)
+
 ```
