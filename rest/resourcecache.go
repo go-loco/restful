@@ -104,25 +104,25 @@ func (rCache *resourceTtlLruMap) get(key string) *Response {
 	resp := rCache.cache[key]
 	rCache.rwMutex.RUnlock()
 
-	if resp != nil {
+	//If expired, remove it
+	if resp != nil && resp.ttl != nil && resp.ttl.Sub(time.Now()) <= 0 {
 
-		//If expired, remove it
+		//Full lock
+		rCache.rwMutex.Lock()
+		defer rCache.rwMutex.Unlock()
+
+		//JIC, get the freshest version
+		resp = rCache.cache[key]
+
+		//Check again with the lock
 		if resp != nil && resp.ttl != nil && resp.ttl.Sub(time.Now()) <= 0 {
-
-			//Full lock
-			rCache.rwMutex.Lock()
-			defer rCache.rwMutex.Unlock()
-
-			//JIC, get the freshest version
-			resp := rCache.cache[key]
-
-			//Check again with the lock
-			if resp != nil && resp.ttl != nil && resp.ttl.Sub(time.Now()) <= 0 {
-				rCache.remove(key, resp)
-				return nil //return. Do not send the move message
-			}
-
+			rCache.remove(key, resp)
+			return nil //return. Do not send the move message
 		}
+
+	}
+
+	if resp != nil {
 
 		//Buffered msg to LruList
 		//Move forward
