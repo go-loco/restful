@@ -1,23 +1,21 @@
-package rest_test
+package rest
 
 import (
 	"net/http"
 	"testing"
-
-	"github.com/go-loco/restful/rest"
 )
 
 func TestMockup(t *testing.T) {
 
-	defer rest.StopMockupServer()
-	rest.StartMockupServer()
+	defer StopMockupServer()
+	StartMockupServer()
 
 	myURL := "http://mytest.com/foo?val1=1&val2=2#fragment"
 
 	myHeaders := make(http.Header)
 	myHeaders.Add("Hello", "world")
 
-	mock := rest.Mock{
+	mock := Mock{
 		URL:          myURL,
 		HTTPMethod:   http.MethodGet,
 		ReqHeaders:   myHeaders,
@@ -25,9 +23,9 @@ func TestMockup(t *testing.T) {
 		RespBody:     "foo",
 	}
 
-	rest.AddMockups(&mock)
+	AddMockups(&mock)
 
-	v := rest.Get(myURL)
+	v := Get(myURL)
 	if v.String() != "foo" {
 		t.Fatal("Mockup Fail!")
 	}

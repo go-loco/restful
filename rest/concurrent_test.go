@@ -1,19 +1,17 @@
-package rest_test
+package rest
 
 import (
 	"net/http"
 	"strconv"
 	"testing"
-
-	"github.com/go-loco/restful/rest"
 )
 
 func TestForkJoin(t *testing.T) {
 
-	var f [7]*rest.FutureResponse
-	var post *rest.FutureResponse
+	var f [7]*FutureResponse
+	var post *FutureResponse
 
-	rest.ForkJoin(func(cr *rest.Concurrent) {
+	ForkJoin(func(cr *Concurrent) {
 		f[0] = cr.Get(server.URL + "/user/1")
 		f[1] = cr.Get(server.URL + "/user/2")
 		f[2] = cr.Head(server.URL + "/user")
@@ -43,11 +41,11 @@ func TestForkJoin(t *testing.T) {
 
 func TestSlowForkJoinGet(t *testing.T) {
 
-	var f [100]*rest.FutureResponse
+	var f [100]*FutureResponse
 
 	for x := 0; x < 50; x++ {
 
-		rb.ForkJoin(func(cr *rest.Concurrent) {
+		rb.ForkJoin(func(cr *Concurrent) {
 			for i := range f {
 				f[i] = cr.Get("/slow/user")
 			}

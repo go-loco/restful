@@ -1,14 +1,12 @@
-package rest_test
+package rest
 
 import (
 	"net/http"
 	"testing"
-
-	"github.com/go-loco/restful/rest"
 )
 
 func TestResponseBytesAndString(t *testing.T) {
-	resp := rest.Get(server.URL + "/user")
+	resp := Get(server.URL + "/user")
 
 	if resp.StatusCode != http.StatusOK {
 		t.Fatal("Status != OK (200)")
@@ -48,9 +46,9 @@ func TestGetFillUpXML(t *testing.T) {
 
 	var u []User
 
-	var rbXML = rest.RequestBuilder{
+	var rbXML = RequestBuilder{
 		BaseURL:     server.URL,
-		ContentType: rest.XML,
+		ContentType: XML,
 	}
 
 	resp := rbXML.Get("/xml/user")

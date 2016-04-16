@@ -10,7 +10,7 @@ import (
 // DefaultTimeout is the default timeout for all clients.
 // Default is 2 seconds.
 // Type: time.Duration
-var DefaultTimeout = time.Duration(2) * time.Second
+var DefaultTimeout = 2 * time.Second
 
 // ContentType represents the Content Type for the Body of HTTP Verbs like
 // POST, PUT, and PATCH

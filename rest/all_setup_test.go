@@ -1,4 +1,4 @@
-package rest_test
+package rest
 
 import (
 	"encoding/json"
@@ -11,11 +11,9 @@ import (
 	"strconv"
 	"testing"
 	"time"
-
-	"github.com/go-loco/restful/rest"
 )
 
-var httpDateFormat = "Mon, 01 Jan 2006 15:04:05 GMT"
+//var httpDateFormat = "Mon, 01 Jan 2006 15:04:05 GMT"
 var lastModifiedDate = time.Now()
 
 type User struct {
@@ -23,8 +21,8 @@ type User struct {
 	Name string `json:"name"`
 }
 
-var mux = http.NewServeMux()
-var server = httptest.NewServer(mux)
+var tmux = http.NewServeMux()
+var server = httptest.NewServer(tmux)
 
 var users []User
 
@@ -32,7 +30,7 @@ var userList = []string{
 	"Hernan", "Mariana", "Matilda", "Juan", "Pedro", "John", "Axel", "Mateo",
 }
 
-var rb = rest.RequestBuilder{
+var rb = RequestBuilder{
 	BaseURL: server.URL,
 }
 
@@ -53,20 +51,20 @@ func setup() {
 	}
 
 	//users
-	mux.HandleFunc("/user", allUsers)
-	mux.HandleFunc("/xml/user", usersXML)
-	mux.HandleFunc("/cache/user", usersCache)
-	mux.HandleFunc("/cache/expires/user", usersCacheWithExpires)
-	mux.HandleFunc("/cache/etag/user", usersEtag)
-	mux.HandleFunc("/cache/lastmodified/user", usersLastModified)
-	mux.HandleFunc("/slow/cache/user", slowUsersCache)
-	mux.HandleFunc("/slow/user", slowUsers)
+	tmux.HandleFunc("/user", allUsers)
+	tmux.HandleFunc("/xml/user", usersXML)
+	tmux.HandleFunc("/cache/user", usersCache)
+	tmux.HandleFunc("/cache/expires/user", usersCacheWithExpires)
+	tmux.HandleFunc("/cache/etag/user", usersEtag)
+	tmux.HandleFunc("/cache/lastmodified/user", usersLastModified)
+	tmux.HandleFunc("/slow/cache/user", slowUsersCache)
+	tmux.HandleFunc("/slow/user", slowUsers)
 
 	//One user
-	mux.HandleFunc("/user/", oneUser)
+	tmux.HandleFunc("/user/", oneUser)
 
 	//Header
-	mux.HandleFunc("/header", withHeader)
+	tmux.HandleFunc("/header", withHeader)
 }
 
 func withHeader(writer http.ResponseWriter, req *http.Request) {

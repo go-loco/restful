@@ -138,7 +138,7 @@
 //
 //  var rb = rest.RequestBuilder{
 //    Headers:             headers,
-//    Timeout:             time.Duration(200) * time.Millisecond,
+//    Timeout:             200 * time.Millisecond,
 //    BaseURL:             "https://baseURL",
 //    Proxy:               "http://myproxy",
 //    ContentType:         rest.JSON,

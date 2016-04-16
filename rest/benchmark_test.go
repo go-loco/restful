@@ -1,12 +1,10 @@
-package rest_test
+package rest
 
 import (
 	"log"
 	"net/http"
 	"strconv"
 	"testing"
-
-	"github.com/go-loco/restful/rest"
 )
 
 func BenchmarkGet(b *testing.B) {
@@ -52,7 +50,7 @@ func BenchmarkSlowConcurrentGet(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 
-		rb.ForkJoin(func(cr *rest.Concurrent) {
+		rb.ForkJoin(func(cr *Concurrent) {
 			for j := 0; j < 100; j++ {
 				cr.Get("/slow/user")
 			}
