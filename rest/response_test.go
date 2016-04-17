@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 )
@@ -15,6 +16,17 @@ func TestResponseBytesAndString(t *testing.T) {
 	if string(resp.Bytes()) != resp.String() {
 		t.Fatal("Bytes() and String() are not equal")
 	}
+
+}
+
+func TestDebug(t *testing.T) {
+	resp := Get(server.URL + "/user")
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatal("Status != OK (200)")
+	}
+
+	fmt.Print(resp.Debug())
 
 }
 

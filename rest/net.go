@@ -21,13 +21,12 @@ var httpDateFormat = "Mon, 01 Jan 2006 15:04:05 GMT"
 func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interface{}) (response *Response) {
 
 	var cacheURL string
-
-	reqURL = rb.BaseURL + reqURL
-	response = new(Response)
-
-	//If Cache enable && operation is read: Cache GET
 	var cacheResp *Response
 
+	response = new(Response)
+	reqURL = rb.BaseURL + reqURL
+
+	//If Cache enable && operation is read: Cache GET
 	if !rb.DisableCache && match(verb, readVerbs) {
 		cacheResp = resourceCache.get(reqURL)
 		if cacheResp != nil && !cacheResp.revalidate {
@@ -83,7 +82,7 @@ func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interfac
 		return
 	}
 
-	copyHTTPResponse(response, httpResp)
+	response.Response = httpResp
 	response.byteBody = respBody
 
 	ttl := setTTL(response)
@@ -187,23 +186,6 @@ func (rb *RequestBuilder) getTimeout() time.Duration {
 	default:
 		return DefaultTimeout
 	}
-
-}
-
-func copyHTTPResponse(resp *Response, httpResp *http.Response) {
-
-	resp.Status = httpResp.Status
-	resp.StatusCode = httpResp.StatusCode
-	resp.Proto = httpResp.Proto
-	resp.ProtoMajor = httpResp.ProtoMajor
-	resp.ProtoMinor = httpResp.ProtoMinor
-
-	resp.Header = httpResp.Header
-	resp.Body = httpResp.Body
-	resp.ContentLength = httpResp.ContentLength
-	resp.Trailer = httpResp.Trailer
-	resp.Request = httpResp.Request
-	resp.TLS = httpResp.TLS
 
 }
 
