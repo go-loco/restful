@@ -3,14 +3,18 @@ package rest
 import (
 	"net/http"
 	"sync"
-	"sync/atomic"
 	"time"
 )
+
+var defaultTransport *http.Transport
+var dTransportMtxOnce sync.Once
 
 // DefaultTimeout is the default timeout for all clients.
 // Default is 2 seconds.
 // Type: time.Duration
 var DefaultTimeout = 2 * time.Second
+
+var DefaultMaxIdleConnsPerHost = 2
 
 // ContentType represents the Content Type for the Body of HTTP Verbs like
 // POST, PUT, and PATCH
@@ -50,11 +54,14 @@ type RequestBuilder struct {
 	// Disable timeout and deafult timeout = no timeout
 	DisableTimeout bool
 
-	// Max Idle Connections per Host for this request builder
-	MaxIdleConnsPerHost int
+	CustomPool *CustomPool
 
-	clientCache atomic.Value //*syncMap
-	rwMutex     sync.RWMutex
+	client    *http.Client
+	mutexOnce sync.Once
+}
+
+type CustomPool struct {
+	MaxIdleConnsPerHost int
 }
 
 // Get issues a GET HTTP verb to the specified URL.

@@ -12,8 +12,6 @@ import (
 	"time"
 )
 
-var transportCache = newSyncMap()
-
 var readVerbs = []string{http.MethodGet, http.MethodHead, http.MethodOptions}
 var contentVerbs = []string{http.MethodPost, http.MethodPut, http.MethodPatch}
 
@@ -51,12 +49,8 @@ func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interfac
 		return
 	}
 
-	//Get TCP connection (client + transport)
-	client, err := rb.connect(reqURL)
-	if err != nil {
-		response.Err = err
-		return
-	}
+	//Get Client (client + transport)
+	client := rb.getClient()
 
 	//Create request
 	request, err := http.NewRequest(verb, reqURL, bytes.NewBuffer(body))
@@ -142,60 +136,45 @@ func (rb *RequestBuilder) marshalReqBody(body interface{}) (b []byte, err error)
 	return
 }
 
-func (rb *RequestBuilder) connect(urlStr string) (*http.Client, error) {
+func (rb *RequestBuilder) getClient() *http.Client {
 
-	//Set client cache
-	clientCache := rb.getClientCache()
+	// This will be executed only once
+	// per request builder
+	rb.mutexOnce.Do(func() {
 
-	// Parse URL
-	parsedURL, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
+		dTransportMtxOnce.Do(func() {
 
-	schemeHost := parsedURL.Scheme + "://" + parsedURL.Host
-	client, cOk := clientCache.get(schemeHost).(*http.Client)
+			println("once ")
+			if defaultTransport == nil {
+				defaultTransport = &http.Transport{
+					MaxIdleConnsPerHost: DefaultMaxIdleConnsPerHost,
+					Proxy:               http.ProxyFromEnvironment}
+			}
+		})
 
-	if !cOk {
+		tr := defaultTransport
 
-		tr, trOk := transportCache.get(schemeHost).(*http.Transport)
+		if cp := rb.CustomPool; cp != nil {
+			tr = &http.Transport{MaxIdleConnsPerHost: rb.CustomPool.MaxIdleConnsPerHost}
 
-		if !trOk {
-
-			tr = &http.Transport{MaxIdleConnsPerHost: rb.getMaxIdle()}
-
-			if set := transportCache.setNX(schemeHost, tr); !set {
-				tr, _ = transportCache.get(schemeHost).(*http.Transport)
+			//Set Proxy
+			if rb.Proxy != "" {
+				if proxy, err := url.Parse(rb.Proxy); err == nil {
+					tr.Proxy = http.ProxyURL(proxy)
+				}
 			}
 
 		}
 
-		client = &http.Client{Transport: tr}
+		rb.client = &http.Client{Transport: tr}
 
 		//Timeout
-		client.Timeout = rb.getTimeout()
+		rb.client.Timeout = rb.getTimeout()
 
-		//Set Proxy
-		if rb.Proxy != "" {
-			if proxy, err := url.Parse(rb.Proxy); err == nil {
-				tr.Proxy = http.ProxyURL(proxy)
-			}
-		}
+	})
+	//
 
-		clientCache.setNX(schemeHost, client)
-
-	}
-
-	return client, nil
-}
-
-func (rb *RequestBuilder) getMaxIdle() int {
-
-	if rb.MaxIdleConnsPerHost > 0 {
-		return rb.MaxIdleConnsPerHost
-	}
-
-	return http.DefaultMaxIdleConnsPerHost
+	return rb.client
 }
 
 func (rb *RequestBuilder) getTimeout() time.Duration {
@@ -208,27 +187,6 @@ func (rb *RequestBuilder) getTimeout() time.Duration {
 	default:
 		return DefaultTimeout
 	}
-
-}
-
-func (rb *RequestBuilder) getClientCache() *syncMap {
-
-	clientCache, ok := rb.clientCache.Load().(*syncMap)
-	if ok {
-		return clientCache
-	}
-
-	rb.rwMutex.Lock()
-	defer rb.rwMutex.Unlock()
-
-	clientCache, ok = rb.clientCache.Load().(*syncMap)
-
-	if !ok {
-		clientCache = newSyncMap()
-		rb.clientCache.Store(clientCache)
-	}
-
-	return clientCache
 
 }
 
