@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 	"time"
 	"unsafe"
@@ -13,7 +14,7 @@ import (
 
 // Response ...
 type Response struct {
-	http.Response
+	*http.Response
 	Err             error
 	byteBody        []byte
 	listElement     *list.Element
@@ -88,4 +89,30 @@ func (r *Response) FillUp(fill interface{}) error {
 
 	return errors.New("Response format neither JSON nor XML")
 
+}
+
+func (r *Response) Debug() string {
+
+	var strReq, strResp string
+
+	if req, err := httputil.DumpRequest(r.Request, true); err != nil {
+		strReq = err.Error()
+	} else {
+		strReq = string(req)
+	}
+
+	if resp, err := httputil.DumpResponse(r.Response, true); err != nil {
+		strResp = err.Error()
+	} else {
+		strResp = string(resp)
+	}
+
+	result := "REQUEST\n"
+	result += "--------\n"
+	result += strReq
+	result += "\n\nRESPONSE\n"
+	result += "--------\n"
+	result += strResp
+
+	return result
 }
