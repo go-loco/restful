@@ -143,7 +143,6 @@ func (rb *RequestBuilder) getClient() *http.Client {
 
 		dTransportMtxOnce.Do(func() {
 
-			println("once ")
 			if defaultTransport == nil {
 				defaultTransport = &http.Transport{
 					MaxIdleConnsPerHost: DefaultMaxIdleConnsPerHost,

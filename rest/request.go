@@ -58,10 +58,16 @@ type RequestBuilder struct {
 
 	client    *http.Client
 	mutexOnce sync.Once
+
+	debug bool
 }
 
 type CustomPool struct {
 	MaxIdleConnsPerHost int
+}
+
+func (rb *RequestBuilder) Debug(on bool) {
+	rb.debug = on
 }
 
 // Get issues a GET HTTP verb to the specified URL.

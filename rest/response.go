@@ -107,11 +107,15 @@ func (r *Response) Debug() string {
 		strResp = string(resp)
 	}
 
-	result := "REQUEST\n"
-	result += "--------\n"
+	const separator = "--------\n"
+
+	result := separator
+	result += "REQUEST\n"
+	result += separator
 	result += strReq
-	result += "\n\nRESPONSE\n"
-	result += "--------\n"
+	result += "\n" + separator
+	result += "RESPONSE\n"
+	result += separator
 	result += strResp
 
 	return result
