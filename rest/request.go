@@ -1,8 +1,10 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -59,7 +61,7 @@ type RequestBuilder struct {
 	client    *http.Client
 	mutexOnce sync.Once
 
-	debug bool
+	debug atomic.Value
 }
 
 type CustomPool struct {
@@ -67,7 +69,8 @@ type CustomPool struct {
 }
 
 func (rb *RequestBuilder) Debug(on bool) {
-	rb.debug = on
+	fmt.Println(on)
+	rb.debug.Store(on)
 }
 
 // Get issues a GET HTTP verb to the specified URL.

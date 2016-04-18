@@ -20,6 +20,10 @@ func TestResponseBytesAndString(t *testing.T) {
 }
 
 func TestDebug(t *testing.T) {
+
+	defer Debug(false)
+	Debug(true)
+
 	resp := Get(server.URL + "/user")
 
 	if resp.StatusCode != http.StatusOK {

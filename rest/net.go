@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -69,8 +71,8 @@ func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interfac
 	}
 
 	// Read response
+	defer httpResp.Body.Close()
 	respBody, err := ioutil.ReadAll(httpResp.Body)
-	httpResp.Body.Close()
 	if err != nil {
 		response.Err = err
 		return
@@ -84,6 +86,8 @@ func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interfac
 
 	response.Response = httpResp
 	response.byteBody = respBody
+
+	debug(response)
 
 	ttl := setTTL(response)
 	lastModified := setLastModified(response)
@@ -99,6 +103,46 @@ func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interfac
 	}
 
 	return
+}
+
+func debug(response *Response) {
+
+	var strReq, strResp string
+
+	fmt.Println("1")
+	d := rb.debug.Load()
+	debug, ok := d.(bool)
+	fmt.Println(debug)
+	fmt.Println(ok)
+	if ok && debug {
+
+		fmt.Println("2")
+		if req, err := httputil.DumpRequest(response.Request, true); err != nil {
+			strReq = err.Error()
+		} else {
+			strReq = string(req)
+		}
+
+		if resp, err := httputil.DumpResponse(response.Response, true); err != nil {
+			strResp = err.Error()
+		} else {
+			strResp = string(resp)
+		}
+
+		const separator = "--------\n"
+
+		dump := separator
+		dump += "REQUEST\n"
+		dump += separator
+		dump += strReq
+		dump += "\n" + separator
+		dump += "RESPONSE\n"
+		dump += separator
+		dump += strResp
+
+		response.debug = dump
+
+	}
 }
 
 func checkMockup(reqURL string) (string, string, error) {

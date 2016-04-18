@@ -6,7 +6,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"net/http"
-	"net/http/httputil"
 	"strings"
 	"time"
 	"unsafe"
@@ -16,6 +15,7 @@ import (
 type Response struct {
 	*http.Response
 	Err             error
+	CacheHit        bool
 	byteBody        []byte
 	listElement     *list.Element
 	skipListElement *skipListNode
@@ -23,6 +23,7 @@ type Response struct {
 	lastModified    *time.Time
 	etag            string
 	revalidate      bool
+	debug           string
 }
 
 func (r *Response) size() int64 {
@@ -92,31 +93,5 @@ func (r *Response) FillUp(fill interface{}) error {
 }
 
 func (r *Response) Debug() string {
-
-	var strReq, strResp string
-
-	if req, err := httputil.DumpRequest(r.Request, true); err != nil {
-		strReq = err.Error()
-	} else {
-		strReq = string(req)
-	}
-
-	if resp, err := httputil.DumpResponse(r.Response, true); err != nil {
-		strResp = err.Error()
-	} else {
-		strResp = string(resp)
-	}
-
-	const separator = "--------\n"
-
-	result := separator
-	result += "REQUEST\n"
-	result += separator
-	result += strReq
-	result += "\n" + separator
-	result += "RESPONSE\n"
-	result += separator
-	result += strResp
-
-	return result
+	return r.debug
 }
