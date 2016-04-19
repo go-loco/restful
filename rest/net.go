@@ -29,7 +29,7 @@ func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interfac
 	//If Cache enable && operation is read: Cache GET
 	if !rb.DisableCache && match(verb, readVerbs) {
 		if cacheResp = resourceCache.get(reqURL); cacheResp != nil {
-			cacheResp.CacheHit = true
+			cacheResp.cacheHit.Store(true)
 			if !cacheResp.revalidate {
 				return cacheResp
 			}

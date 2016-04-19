@@ -7,7 +7,7 @@ import (
 )
 
 // The default transport used by all RequestBuilders
-// that don't set a custom pool
+// that haven't set up a CustomPool
 var defaultTransport *http.Transport
 
 // Sync once to set default client and transport to default Request Builder
@@ -62,10 +62,10 @@ type RequestBuilder struct {
 	// RequestBuilder
 	CustomPool *CustomPool
 
-	//
+	// Set Basic Auth for this RequestBuilder
 	BasicAuth *BasicAuth
 
-	//
+	// Set an specific User Agent for this RequestBuilder
 	UserAgent string
 
 	client        *http.Client
@@ -78,6 +78,8 @@ type CustomPool struct {
 	Proxy               string
 }
 
+// BasicAuth gives the possibility to set UserName and Password for a given
+// RequestBuilder. Basic Auth is used by some APIs
 type BasicAuth struct {
 	UserName string
 	Password string

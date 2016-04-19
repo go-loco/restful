@@ -1,8 +1,8 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -27,8 +27,9 @@ func TestDebug(t *testing.T) {
 		t.Fatal("Status != OK (200)")
 	}
 
-	fmt.Print(resp.Debug())
-	fmt.Println(resp)
+	if !strings.Contains(resp.Debug(), resp.String()) {
+		t.Fatal("Debug() failed!")
+	}
 
 }
 

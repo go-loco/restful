@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"strings"
+	"sync/atomic"
 	"time"
 	"unsafe"
 )
@@ -16,7 +17,6 @@ import (
 type Response struct {
 	*http.Response
 	Err             error
-	CacheHit        bool
 	byteBody        []byte
 	listElement     *list.Element
 	skipListElement *skipListNode
@@ -24,6 +24,7 @@ type Response struct {
 	lastModified    *time.Time
 	etag            string
 	revalidate      bool
+	cacheHit        atomic.Value
 }
 
 func (r *Response) size() int64 {
@@ -90,6 +91,14 @@ func (r *Response) FillUp(fill interface{}) error {
 
 	return errors.New("Response format neither JSON nor XML")
 
+}
+
+// CacheHit shows if a response was get from the cache.
+func (r *Response) CacheHit() bool {
+	if hit, ok := r.cacheHit.Load().(bool); hit && ok {
+		return true
+	}
+	return false
 }
 
 // Debug let any request/response to be dumped, showing how the request/response
