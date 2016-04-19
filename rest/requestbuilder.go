@@ -49,9 +49,6 @@ type RequestBuilder struct {
 	// Base URL to be used for each Request. The final URL will be BaseURL + URL.
 	BaseURL string
 
-	// Proxy, if any.
-	Proxy string
-
 	// ContentType: JSON or XML
 	ContentType ContentType
 
@@ -65,6 +62,9 @@ type RequestBuilder struct {
 	// RequestBuilder
 	CustomPool *CustomPool
 
+	//
+	BasicAuth *BasicAuth
+
 	client        *http.Client
 	clientMtxOnce sync.Once
 }
@@ -72,6 +72,12 @@ type RequestBuilder struct {
 // CustomPool defines a separate internal *transport* and connection pooling.
 type CustomPool struct {
 	MaxIdleConnsPerHost int
+	Proxy               string
+}
+
+type BasicAuth struct {
+	UserName string
+	Password string
 }
 
 // Get issues a GET HTTP verb to the specified URL.

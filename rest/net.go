@@ -158,8 +158,8 @@ func (rb *RequestBuilder) getClient() *http.Client {
 			tr = &http.Transport{MaxIdleConnsPerHost: rb.CustomPool.MaxIdleConnsPerHost}
 
 			//Set Proxy
-			if rb.Proxy != "" {
-				if proxy, err := url.Parse(rb.Proxy); err == nil {
+			if cp.Proxy != "" {
+				if proxy, err := url.Parse(cp.Proxy); err == nil {
 					tr.Proxy = http.ProxyURL(proxy)
 				}
 			}
@@ -192,6 +192,11 @@ func (rb *RequestBuilder) getTimeout() time.Duration {
 
 func (rb *RequestBuilder) setParams(client *http.Client, req *http.Request, cacheResp *Response, cacheURL string) {
 
+	//Custom Headers
+	if rb.Headers != nil {
+		req.Header = rb.Headers
+	}
+
 	//Default headers
 	req.Header.Set("Connection", "keep-alive")
 	req.Header.Set("Cache-Control", "no-cache")
@@ -201,9 +206,9 @@ func (rb *RequestBuilder) setParams(client *http.Client, req *http.Request, cach
 		req.Header.Set("X-Original-URL", cacheURL)
 	}
 
-	//Custom Headers
-	if rb.Headers != nil {
-		req.Header = rb.Headers
+	// Basic Auth
+	if rb.BasicAuth != nil {
+		req.SetBasicAuth(rb.BasicAuth.UserName, rb.BasicAuth.Password)
 	}
 
 	//Encoding
