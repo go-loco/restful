@@ -177,7 +177,3 @@ func AsyncOptions(url string, f func(*Response)) {
 func ForkJoin(f func(*Concurrent)) {
 	dfltBuilder.ForkJoin(f)
 }
-
-func Debug(on bool) {
-	dfltBuilder.Debug(on)
-}

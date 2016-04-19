@@ -1,14 +1,16 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
+// The default transport used by all RequestBuilders
+// that don't set a custom pool
 var defaultTransport *http.Transport
+
+// Sync once to set default client and transport to default Request Builder
 var dTransportMtxOnce sync.Once
 
 // DefaultTimeout is the default timeout for all clients.
@@ -16,6 +18,9 @@ var dTransportMtxOnce sync.Once
 // Type: time.Duration
 var DefaultTimeout = 2 * time.Second
 
+// DefaultMaxIdleConnsPerHost is the default maxium idle connections to have
+// per Host for all clients, that use *any* RequestBuilder that don't set
+// a CustomPool
 var DefaultMaxIdleConnsPerHost = 2
 
 // ContentType represents the Content Type for the Body of HTTP Verbs like
@@ -56,21 +61,17 @@ type RequestBuilder struct {
 	// Disable timeout and deafult timeout = no timeout
 	DisableTimeout bool
 
+	// Create a CustomPool if you don't want to share the *transport*, with others
+	// RequestBuilder
 	CustomPool *CustomPool
 
-	client    *http.Client
-	mutexOnce sync.Once
-
-	debug atomic.Value
+	client        *http.Client
+	clientMtxOnce sync.Once
 }
 
+// CustomPool defines a separate internal *transport* and connection pooling.
 type CustomPool struct {
 	MaxIdleConnsPerHost int
-}
-
-func (rb *RequestBuilder) Debug(on bool) {
-	fmt.Println(on)
-	rb.debug.Store(on)
 }
 
 // Get issues a GET HTTP verb to the specified URL.

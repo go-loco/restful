@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 	"time"
 	"unsafe"
@@ -23,7 +24,6 @@ type Response struct {
 	lastModified    *time.Time
 	etag            string
 	revalidate      bool
-	debug           string
 }
 
 func (r *Response) size() int64 {
@@ -92,6 +92,36 @@ func (r *Response) FillUp(fill interface{}) error {
 
 }
 
+// Debug let any request/response to be dumped, showing how the request/response
+// went through the wire, only if debug mode is *on* on RequestBuilder.
 func (r *Response) Debug() string {
-	return r.debug
+
+	var strReq, strResp string
+
+	if req, err := httputil.DumpRequest(r.Request, true); err != nil {
+		strReq = err.Error()
+	} else {
+		strReq = string(req)
+	}
+
+	if resp, err := httputil.DumpResponse(r.Response, false); err != nil {
+		strResp = err.Error()
+	} else {
+		strResp = string(resp)
+	}
+
+	const separator = "--------\n"
+
+	dump := separator
+	dump += "REQUEST\n"
+	dump += separator
+	dump += strReq
+	dump += "\n" + separator
+	dump += "RESPONSE\n"
+	dump += separator
+	dump += strResp
+	dump += r.String() + "\n"
+
+	return dump
+
 }
