@@ -65,6 +65,9 @@ type RequestBuilder struct {
 	//
 	BasicAuth *BasicAuth
 
+	//
+	UserAgent string
+
 	client        *http.Client
 	clientMtxOnce sync.Once
 }

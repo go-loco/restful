@@ -211,6 +211,14 @@ func (rb *RequestBuilder) setParams(client *http.Client, req *http.Request, cach
 		req.SetBasicAuth(rb.BasicAuth.UserName, rb.BasicAuth.Password)
 	}
 
+	// User Agent
+	req.Header.Set("User-Agent", func() string {
+		if rb.UserAgent != "" {
+			return rb.UserAgent
+		}
+		return "github.com/go-loco/restful"
+	}())
+
 	//Encoding
 	var cType string
 
