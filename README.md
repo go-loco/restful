@@ -3,8 +3,9 @@
 ========
 
 [![Build Status](https://travis-ci.org/go-loco/restful/rest.svg?branch=master)](https://travis-ci.org/go-loco/restful/rest)
+[![GoCover](https://gocover.io/_badge/github.com/go-loco/restful/rest)](http://gocover.io/github.com/go-loco/restful/rest)  [![GoReport](https://goreportcard.com/badge/go-loco/restful/rest)](http://goreportcard.com/report/go-loco/restful/rest)  
 [![Release](https://img.shields.io/github/release/go-loco/restful/rest.svg?style=flat)](https://github.com/go-loco/restful/rest/releases)
-[![GoCover](https://gocover.io/_badge/github.com/go-loco/restful/rest)](http://gocover.io/github.com/go-loco/restful/rest)  [![GoReport](https://goreportcard.com/badge/go-loco/restful/rest)](http://goreportcard.com/report/go-loco/restful/rest)  [![GoDoc](http://godoc.org/github.com/go-loco/restful/rest?status.svg)](http://godoc.org/github.com/go-loco/restful/rest)
+[![GoDoc](http://godoc.org/github.com/go-loco/restful/rest?status.svg)](http://godoc.org/github.com/go-loco/restful/rest)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/go-loco/restful/rest)
 
 ## An extremely simple to use, lightweight, yet powerful REST Client
@@ -16,33 +17,33 @@ and the possibility to mockup responses.
 
 ## Features and Roadmap
 ### v0.1
-* GET, POST, PUT, PATCH, DELETE, HEAD & OPTIONS HTTP verbs
+* `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD` & `OPTIONS` HTTP verbs
 * Dead simple, synchronous requests
-* Automatic caching of transport object and hosts connections
-* Response Caching, based on response headers (cache-control, last-modified, etag, expires)
+* Automatic caching of hosts connections
+* **Response Caching**, based on response headers (cache-control, last-modified, etag, expires)
 * Local caching strategies: TTL, LRU & Max Byte Size.
 * Mockups!
-* Fork-Join request pattern, for sending many requests concurrently, getting better client perfomance.
+* Fork-Join request pattern, for sending many requests concurrently, improving client perfomance.
 * Async request pattern.
 * Request Body can be `string`, `[]byte`, `struct` & `map`.
 * Automatic marshal and unmarshal for `JSON` and `XML` Content-Type. Default JSON.
 * Full access to http.Response object.
-
-### v0.2
 * Retries
 * BasicAuth
 * UserAgent
+* Gzip support
+* HTTP/2 support (automatic with Go +1.6)
 
-### v0.3
+### v0.2
 * Connection usage metrics
 * Response Time metrics
 * Brotli Content-Encoding Responses support - http://google-opensource.blogspot.com.ar/2015/09/introducing-brotli-new-compression.html
 
-### v0.4
+### v0.3
 * Custom Root Certificates and Client Certificates
 * Testing +95%
 
-### v0.5
+### v0.4
 * Plugable external caches like Memcached
 
 ## Caching
