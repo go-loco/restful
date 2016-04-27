@@ -155,7 +155,7 @@ func (rCache *resourceTtlLruMap) setNX(key string, value *Response) {
 			resp:      value,
 		}
 
-		//Set ttl if necesary
+		//Set ttl if necessary
 		if value.ttl != nil {
 			value.skipListElement = rCache.skipList.insert(key, *value.ttl)
 			rCache.ttlChan <- true

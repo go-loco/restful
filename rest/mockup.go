@@ -47,7 +47,7 @@ type Mock struct {
 	RespBody string
 }
 
-// StartMockupServer sets the enviroment to send all client requests
+// StartMockupServer sets the environment to send all client requests
 // to the mockup server.
 func StartMockupServer() {
 

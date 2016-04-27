@@ -15,7 +15,7 @@
 //  * Response Caching, based on response headers (cache-control, last-modified, etag, expires)
 //  * Local caching strategies: TTL, LRU & Max Byte Size.
 //  * Mockups!
-//  * Fork-Join request pattern, for sending many requests concurrently, getting better client perfomance.
+//  * Fork-Join request pattern, for sending many requests concurrently, getting better client performance.
 //  * Async request pattern.
 //  * Request Body can be `string`, `[]byte`, `struct` & `map`
 //  * Automatic marshal and unmarshal for `JSON` and `XML` Content-Type. Default JSON.
