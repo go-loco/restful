@@ -85,13 +85,18 @@ type BasicAuth struct {
 	Password string
 }
 
+type QueryString struct {
+	K string
+	V string
+}
+
 // Get issues a GET HTTP verb to the specified URL.
 //
 // In Restful, GET is used for "reading" or retrieving a resource.
 // Client should expect a response status code of 200(OK) if resource exists,
 // 404(Not Found) if it doesn't, or 400(Bad Request).
-func (rb *RequestBuilder) Get(url string) *Response {
-	return rb.doRequest(http.MethodGet, url, nil)
+func (rb *RequestBuilder) Get(url string, queryString ...QueryString) *Response {
+	return rb.doRequest(http.MethodGet, url, nil, queryString...)
 }
 
 // Post issues a POST HTTP verb to the specified URL.
@@ -101,7 +106,7 @@ func (rb *RequestBuilder) Get(url string) *Response {
 // 404(Not Found), or 409(Conflict) if resource already exist.
 //
 // Body could be any of the form: string, []byte, struct & map.
-func (rb *RequestBuilder) Post(url string, body interface{}) *Response {
+func (rb *RequestBuilder) Post(url string, body interface{}, queryString ...QueryString) *Response {
 	return rb.doRequest(http.MethodPost, url, body)
 }
 
@@ -112,7 +117,7 @@ func (rb *RequestBuilder) Post(url string, body interface{}) *Response {
 // or 400(Bad Request). 200(OK) could be also 204(No Content)
 //
 // Body could be any of the form: string, []byte, struct & map.
-func (rb *RequestBuilder) Put(url string, body interface{}) *Response {
+func (rb *RequestBuilder) Put(url string, body interface{}, queryString ...QueryString) *Response {
 	return rb.doRequest(http.MethodPut, url, body)
 }
 
@@ -123,7 +128,7 @@ func (rb *RequestBuilder) Put(url string, body interface{}) *Response {
 // or 400(Bad Request). 200(OK) could be also 204(No Content)
 //
 // Body could be any of the form: string, []byte, struct & map.
-func (rb *RequestBuilder) Patch(url string, body interface{}) *Response {
+func (rb *RequestBuilder) Patch(url string, body interface{}, queryString ...QueryString) *Response {
 	return rb.doRequest(http.MethodPatch, url, nil)
 }
 
@@ -132,7 +137,7 @@ func (rb *RequestBuilder) Patch(url string, body interface{}) *Response {
 // In Restful, DELETE is used to "delete" a resource.
 // Client should expect a response status code of of 200(OK), 404(Not Found),
 // or 400(Bad Request).
-func (rb *RequestBuilder) Delete(url string) *Response {
+func (rb *RequestBuilder) Delete(url string, queryString ...QueryString) *Response {
 	return rb.doRequest(http.MethodDelete, url, nil)
 }
 
@@ -141,7 +146,7 @@ func (rb *RequestBuilder) Delete(url string) *Response {
 // In Restful, HEAD is used to "read" a resource headers only.
 // Client should expect a response status code of 200(OK) if resource exists,
 // 404(Not Found) if it doesn't, or 400(Bad Request).
-func (rb *RequestBuilder) Head(url string) *Response {
+func (rb *RequestBuilder) Head(url string, queryString ...QueryString) *Response {
 	return rb.doRequest(http.MethodHead, url, nil)
 }
 
@@ -151,7 +156,7 @@ func (rb *RequestBuilder) Head(url string) *Response {
 // and supported HTTP verbs.
 // Client should expect a response status code of 200(OK) if resource exists,
 // 404(Not Found) if it doesn't, or 400(Bad Request).
-func (rb *RequestBuilder) Options(url string) *Response {
+func (rb *RequestBuilder) Options(url string, queryString ...QueryString) *Response {
 	return rb.doRequest(http.MethodOptions, url, nil)
 }
 

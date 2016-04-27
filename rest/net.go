@@ -18,7 +18,7 @@ var contentVerbs = []string{http.MethodPost, http.MethodPut, http.MethodPatch}
 var maxAge = regexp.MustCompile(`(?:max-age|s-maxage)=(\d+)`)
 var httpDateFormat = "Mon, 01 Jan 2006 15:04:05 GMT"
 
-func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interface{}) (response *Response) {
+func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interface{}, queryString ...QueryString) (response *Response) {
 
 	var cacheURL string
 	var cacheResp *Response

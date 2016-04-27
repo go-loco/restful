@@ -9,8 +9,8 @@ var dfltBuilder = RequestBuilder{}
 // 404(Not Found) if it doesn't, or 400(Bad Request).
 //
 // Get uses the DefaultBuilder.
-func Get(url string) *Response {
-	return dfltBuilder.Get(url)
+func Get(url string, queryString ...Query) *Response {
+	return dfltBuilder.Get(url, queryString...)
 }
 
 // Post issues a POST HTTP verb to the specified URL.
