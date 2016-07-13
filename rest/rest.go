@@ -22,8 +22,8 @@ func Get(url string, queryString ...Query) *Response {
 // Body could be any of the form: string, []byte, struct & map.
 //
 // Post uses the DefaultBuilder.
-func Post(url string, body interface{}) *Response {
-	return dfltBuilder.Post(url, body)
+func Post(url string, body interface{}, queryString ...Query) *Response {
+	return dfltBuilder.Post(url, body, queryString...)
 }
 
 // Put issues a PUT HTTP verb to the specified URL.
@@ -35,8 +35,8 @@ func Post(url string, body interface{}) *Response {
 // Body could be any of the form: string, []byte, struct & map.
 //
 // Put uses the DefaultBuilder.
-func Put(url string, body interface{}) *Response {
-	return dfltBuilder.Put(url, body)
+func Put(url string, body interface{}, queryString ...Query) *Response {
+	return dfltBuilder.Put(url, body, queryString...)
 }
 
 // Patch issues a PATCH HTTP verb to the specified URL
@@ -48,8 +48,8 @@ func Put(url string, body interface{}) *Response {
 // Body could be any of the form: string, []byte, struct & map.
 //
 // Patch uses the DefaultBuilder.
-func Patch(url string, body interface{}) *Response {
-	return dfltBuilder.Patch(url, body)
+func Patch(url string, body interface{}, queryString ...Query) *Response {
+	return dfltBuilder.Patch(url, body, queryString...)
 }
 
 // Delete issues a DELETE HTTP verb to the specified URL
@@ -59,8 +59,8 @@ func Patch(url string, body interface{}) *Response {
 // or 400(Bad Request).
 //
 // Delete uses the DefaultBuilder.
-func Delete(url string) *Response {
-	return dfltBuilder.Delete(url)
+func Delete(url string, queryString ...Query) *Response {
+	return dfltBuilder.Delete(url, queryString...)
 }
 
 // Head issues a HEAD HTTP verb to the specified URL
@@ -70,8 +70,8 @@ func Delete(url string) *Response {
 // 404(Not Found) if it doesn't, or 400(Bad Request).
 //
 // Head uses the DefaultBuilder.
-func Head(url string) *Response {
-	return dfltBuilder.Head(url)
+func Head(url string, queryString ...Query) *Response {
+	return dfltBuilder.Head(url, queryString...)
 }
 
 // Options issues a OPTIONS HTTP verb to the specified URL
@@ -82,8 +82,8 @@ func Head(url string) *Response {
 // 404(Not Found) if it doesn't, or 400(Bad Request).
 //
 // Options uses the DefaultBuilder.
-func Options(url string) *Response {
-	return dfltBuilder.Options(url)
+func Options(url string, queryString ...Query) *Response {
+	return dfltBuilder.Options(url, queryString...)
 }
 
 // AsyncGet is the *asynchronous* option for GET.
@@ -92,8 +92,8 @@ func Options(url string) *Response {
 // Whenever the Response is ready, the *f* function will be called back.
 //
 // AsyncGet uses the DefaultBuilder
-func AsyncGet(url string, f func(*Response)) {
-	dfltBuilder.AsyncGet(url, f)
+func AsyncGet(url string, queryString ...Query) <-chan *Response {
+	return dfltBuilder.AsyncGet(url, queryString...)
 }
 
 // AsyncPost is the *asynchronous* option for POST.
@@ -102,8 +102,8 @@ func AsyncGet(url string, f func(*Response)) {
 // Whenever the Response is ready, the *f* function will be called back.
 //
 // AsyncPost uses the DefaultBuilder
-func AsyncPost(url string, body interface{}, f func(*Response)) {
-	dfltBuilder.AsyncPost(url, body, f)
+func AsyncPost(url string, body interface{}, queryString ...Query) <-chan *Response {
+	return dfltBuilder.AsyncPost(url, body, queryString...)
 }
 
 // AsyncPut is the *asynchronous* option for PUT.
@@ -112,8 +112,8 @@ func AsyncPost(url string, body interface{}, f func(*Response)) {
 // Whenever the Response is ready, the *f* function will be called back.
 //
 // AsyncPut uses the DefaultBuilder
-func AsyncPut(url string, body interface{}, f func(*Response)) {
-	dfltBuilder.AsyncPut(url, body, f)
+func AsyncPut(url string, body interface{}, queryString ...Query) <-chan *Response {
+	return dfltBuilder.AsyncPut(url, body, queryString...)
 }
 
 // AsyncPatch is the *asynchronous* option for PATCH.
@@ -122,8 +122,8 @@ func AsyncPut(url string, body interface{}, f func(*Response)) {
 // Whenever the Response is ready, the *f* function will be called back.
 //
 // AsyncPatch uses the DefaultBuilder
-func AsyncPatch(url string, body interface{}, f func(*Response)) {
-	dfltBuilder.AsyncPatch(url, body, f)
+func AsyncPatch(url string, body interface{}, queryString ...Query) <-chan *Response {
+	return dfltBuilder.AsyncPatch(url, body, queryString...)
 }
 
 // AsyncDelete is the *asynchronous* option for DELETE.
@@ -132,8 +132,8 @@ func AsyncPatch(url string, body interface{}, f func(*Response)) {
 // Whenever the Response is ready, the *f* function will be called back.
 //
 // AsyncDelete uses the DefaultBuilder
-func AsyncDelete(url string, f func(*Response)) {
-	dfltBuilder.AsyncDelete(url, f)
+func AsyncDelete(url string, queryString ...Query) <-chan *Response {
+	return dfltBuilder.AsyncDelete(url, queryString...)
 }
 
 // AsyncHead is the *asynchronous* option for HEAD.
@@ -142,8 +142,8 @@ func AsyncDelete(url string, f func(*Response)) {
 // Whenever the Response is ready, the *f* function will be called back.
 //
 // AsyncHead uses the DefaultBuilder
-func AsyncHead(url string, f func(*Response)) {
-	dfltBuilder.AsyncHead(url, f)
+func AsyncHead(url string, queryString ...Query) <-chan *Response {
+	return dfltBuilder.AsyncHead(url, queryString...)
 }
 
 // AsyncOptions is the *asynchronous* option for OPTIONS.
@@ -152,8 +152,8 @@ func AsyncHead(url string, f func(*Response)) {
 // Whenever the Response is ready, the *f* function will be called back.
 //
 // AsyncOptions uses the DefaultBuilder
-func AsyncOptions(url string, f func(*Response)) {
-	dfltBuilder.AsyncOptions(url, f)
+func AsyncOptions(url string, queryString ...Query) <-chan *Response {
+	return dfltBuilder.AsyncOptions(url, queryString...)
 }
 
 // ForkJoin let you *fork* requests, and *wait* until all of them have return.

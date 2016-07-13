@@ -2,12 +2,12 @@
 ## A Rest Client for Go (Golang)
 ========
 
-[![Build Status](https://travis-ci.org/go-loco/restful/rest.svg?branch=master)](https://travis-ci.org/go-loco/restful/rest)
-[![Coverage Status](https://coveralls.io/repos/github/go-loco/restful/rest/badge.svg?branch=master)](https://coveralls.io/github/go-loco/restful/rest?branch=master)
+[![Build Status](https://travis-ci.org/go-loco/restful.svg?branch=master)](https://travis-ci.org/go-loco/restful)
+[![Coverage Status](https://coveralls.io/repos/github/go-loco/restful/badge.svg?branch=master)](https://coveralls.io/github/go-loco/restful?branch=master)
 [![GoReport](https://goreportcard.com/badge/github.com/go-loco/restful/rest)](http://goreportcard.com/report/github.com/go-loco/restful/rest)
-[![Release](https://img.shields.io/github/release/go-loco/restful/rest.svg?style=flat)](https://github.com/go-loco/restful/rest/releases)
+[![Release](https://img.shields.io/github/release/go-loco/restful.svg?style=flat)](https://github.com/go-loco/restful/releases)
 [![GoDoc](http://godoc.org/github.com/go-loco/restful/rest?status.svg)](http://godoc.org/github.com/go-loco/restful/rest)
-[![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/go-loco/restful/rest)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/go-loco/restful/blob/master/LICENSE)
 
 ## An extremely simple to use, lightweight, yet powerful REST Client
 
@@ -24,7 +24,7 @@ and the possibility to mockup responses.
 * **Response Caching**, based on response headers (cache-control, last-modified, etag, expires)
 * Local caching strategies: TTL, LRU & Max Byte Size.
 * Mockups!
-* Fork-Join request pattern, for sending many requests concurrently, improving client perfomance.
+* Fork-Join request pattern, for sending many requests concurrently, improving client performance.
 * Async request pattern.
 * Request Body can be `string`, `[]byte`, `struct` & `map`.
 * Automatic marshal and unmarshal for `JSON` and `XML` Content-Type. Default JSON.

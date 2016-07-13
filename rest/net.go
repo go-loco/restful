@@ -18,7 +18,7 @@ var contentVerbs = []string{http.MethodPost, http.MethodPut, http.MethodPatch}
 var maxAge = regexp.MustCompile(`(?:max-age|s-maxage)=(\d+)`)
 var httpDateFormat = "Mon, 01 Jan 2006 15:04:05 GMT"
 
-func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interface{}, queryString ...QueryString) (response *Response) {
+func (rb *RequestBuilder) doRequest(verb string, reqURL string, reqBody interface{}, queryString ...Query) (response *Response) {
 
 	var cacheURL string
 	var cacheResp *Response
@@ -139,10 +139,16 @@ func (rb *RequestBuilder) marshalReqBody(body interface{}) (b []byte, err error)
 
 func (rb *RequestBuilder) getClient() *http.Client {
 
-	// This will be executed only once
-	// per request builder
+	// The following piece of code will be executed only once
+	// per request builder.
+
+	//////
+	// Create the client just once
 	rb.clientMtxOnce.Do(func() {
 
+		///////
+		// Create default transport just once
+		// If there's a proxy environment, use it
 		dTransportMtxOnce.Do(func() {
 
 			if defaultTransport == nil {
@@ -151,28 +157,30 @@ func (rb *RequestBuilder) getClient() *http.Client {
 					Proxy:               http.ProxyFromEnvironment}
 			}
 		})
+		///////
 
 		tr := defaultTransport
 
+		// If Custom Pool -> set a custom transport
 		if cp := rb.CustomPool; cp != nil {
 			tr = &http.Transport{MaxIdleConnsPerHost: rb.CustomPool.MaxIdleConnsPerHost}
 
-			//Set Proxy
+			// Set Proxy
 			if cp.Proxy != "" {
 				if proxy, err := url.Parse(cp.Proxy); err == nil {
 					tr.Proxy = http.ProxyURL(proxy)
 				}
 			}
 
-		}
+		} //
 
 		rb.client = &http.Client{Transport: tr}
 
-		//Timeout
+		// Set Timeout
 		rb.client.Timeout = rb.getTimeout()
 
 	})
-	//
+	///////
 
 	return rb.client
 }

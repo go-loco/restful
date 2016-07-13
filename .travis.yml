@@ -3,3 +3,9 @@ language: go
 go:
   - 1.6.2
   - tip
+before_install:
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+script:
+  - cd rest
+  - $HOME/gopath/bin/goveralls -service=travis-ci

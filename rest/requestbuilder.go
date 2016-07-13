@@ -68,7 +68,11 @@ type RequestBuilder struct {
 	// Set an specific User Agent for this RequestBuilder
 	UserAgent string
 
-	client        *http.Client
+	// Client might be configured with a custom Timeout, but may share the same
+	// default transport
+	client *http.Client
+
+	// Create the client and default transport just once
 	clientMtxOnce sync.Once
 }
 
@@ -85,9 +89,9 @@ type BasicAuth struct {
 	Password string
 }
 
-type QueryString struct {
-	K string
-	V string
+type Query struct {
+	Field string
+	Value string
 }
 
 // Get issues a GET HTTP verb to the specified URL.
@@ -95,7 +99,7 @@ type QueryString struct {
 // In Restful, GET is used for "reading" or retrieving a resource.
 // Client should expect a response status code of 200(OK) if resource exists,
 // 404(Not Found) if it doesn't, or 400(Bad Request).
-func (rb *RequestBuilder) Get(url string, queryString ...QueryString) *Response {
+func (rb *RequestBuilder) Get(url string, queryString ...Query) *Response {
 	return rb.doRequest(http.MethodGet, url, nil, queryString...)
 }
 
@@ -106,7 +110,7 @@ func (rb *RequestBuilder) Get(url string, queryString ...QueryString) *Response 
 // 404(Not Found), or 409(Conflict) if resource already exist.
 //
 // Body could be any of the form: string, []byte, struct & map.
-func (rb *RequestBuilder) Post(url string, body interface{}, queryString ...QueryString) *Response {
+func (rb *RequestBuilder) Post(url string, body interface{}, queryString ...Query) *Response {
 	return rb.doRequest(http.MethodPost, url, body)
 }
 
@@ -117,7 +121,7 @@ func (rb *RequestBuilder) Post(url string, body interface{}, queryString ...Quer
 // or 400(Bad Request). 200(OK) could be also 204(No Content)
 //
 // Body could be any of the form: string, []byte, struct & map.
-func (rb *RequestBuilder) Put(url string, body interface{}, queryString ...QueryString) *Response {
+func (rb *RequestBuilder) Put(url string, body interface{}, queryString ...Query) *Response {
 	return rb.doRequest(http.MethodPut, url, body)
 }
 
@@ -128,7 +132,7 @@ func (rb *RequestBuilder) Put(url string, body interface{}, queryString ...Query
 // or 400(Bad Request). 200(OK) could be also 204(No Content)
 //
 // Body could be any of the form: string, []byte, struct & map.
-func (rb *RequestBuilder) Patch(url string, body interface{}, queryString ...QueryString) *Response {
+func (rb *RequestBuilder) Patch(url string, body interface{}, queryString ...Query) *Response {
 	return rb.doRequest(http.MethodPatch, url, nil)
 }
 
@@ -137,7 +141,7 @@ func (rb *RequestBuilder) Patch(url string, body interface{}, queryString ...Que
 // In Restful, DELETE is used to "delete" a resource.
 // Client should expect a response status code of of 200(OK), 404(Not Found),
 // or 400(Bad Request).
-func (rb *RequestBuilder) Delete(url string, queryString ...QueryString) *Response {
+func (rb *RequestBuilder) Delete(url string, queryString ...Query) *Response {
 	return rb.doRequest(http.MethodDelete, url, nil)
 }
 
@@ -146,7 +150,7 @@ func (rb *RequestBuilder) Delete(url string, queryString ...QueryString) *Respon
 // In Restful, HEAD is used to "read" a resource headers only.
 // Client should expect a response status code of 200(OK) if resource exists,
 // 404(Not Found) if it doesn't, or 400(Bad Request).
-func (rb *RequestBuilder) Head(url string, queryString ...QueryString) *Response {
+func (rb *RequestBuilder) Head(url string, queryString ...Query) *Response {
 	return rb.doRequest(http.MethodHead, url, nil)
 }
 
@@ -156,7 +160,7 @@ func (rb *RequestBuilder) Head(url string, queryString ...QueryString) *Response
 // and supported HTTP verbs.
 // Client should expect a response status code of 200(OK) if resource exists,
 // 404(Not Found) if it doesn't, or 400(Bad Request).
-func (rb *RequestBuilder) Options(url string, queryString ...QueryString) *Response {
+func (rb *RequestBuilder) Options(url string, queryString ...Query) *Response {
 	return rb.doRequest(http.MethodOptions, url, nil)
 }
 
@@ -164,60 +168,81 @@ func (rb *RequestBuilder) Options(url string, queryString ...QueryString) *Respo
 // The go routine calling AsyncGet(), will not be blocked.
 //
 // Whenever the Response is ready, the *f* function will be called back.
-func (rb *RequestBuilder) AsyncGet(url string, f func(*Response)) {
-	go doAsyncRequest(rb.Get(url), f)
+func (rb *RequestBuilder) AsyncGet(url string, queryString ...Query) <-chan *Response {
+	return doAsync(rb.Get, url, queryString...)
 }
 
 // AsyncPost is the *asynchronous* option for POST.
 // The go routine calling AsyncPost(), will not be blocked.
 //
 // Whenever the Response is ready, the *f* function will be called back.
-func (rb *RequestBuilder) AsyncPost(url string, body interface{}, f func(*Response)) {
-	go doAsyncRequest(rb.Post(url, body), f)
+func (rb *RequestBuilder) AsyncPost(url string, body interface{}, queryString ...Query) <-chan *Response {
+	return doAsyncWithBody(rb.Post, url, body, queryString...)
 }
 
 // AsyncPut is the *asynchronous* option for PUT.
 // The go routine calling AsyncPut(), will not be blocked.
 //
 // Whenever the Response is ready, the *f* function will be called back.
-func (rb *RequestBuilder) AsyncPut(url string, body interface{}, f func(*Response)) {
-	go doAsyncRequest(rb.Put(url, body), f)
+func (rb *RequestBuilder) AsyncPut(url string, body interface{}, queryString ...Query) <-chan *Response {
+	return doAsyncWithBody(rb.Put, url, body, queryString...)
 }
 
 // AsyncPatch is the *asynchronous* option for PATCH.
 // The go routine calling AsyncPatch(), will not be blocked.
 //
 // Whenever the Response is ready, the *f* function will be called back.
-func (rb *RequestBuilder) AsyncPatch(url string, body interface{}, f func(*Response)) {
-	go doAsyncRequest(rb.Patch(url, body), f)
+func (rb *RequestBuilder) AsyncPatch(url string, body interface{}, queryString ...Query) <-chan *Response {
+	return doAsyncWithBody(rb.Patch, url, body, queryString...)
 }
 
 // AsyncDelete is the *asynchronous* option for DELETE.
 // The go routine calling AsyncDelete(), will not be blocked.
 //
 // Whenever the Response is ready, the *f* function will be called back.
-func (rb *RequestBuilder) AsyncDelete(url string, f func(*Response)) {
-	go doAsyncRequest(rb.Delete(url), f)
+func (rb *RequestBuilder) AsyncDelete(url string, queryString ...Query) <-chan *Response {
+	return doAsync(rb.Delete, url, queryString...)
 }
 
 // AsyncHead is the *asynchronous* option for HEAD.
 // The go routine calling AsyncHead(), will not be blocked.
 //
 // Whenever the Response is ready, the *f* function will be called back.
-func (rb *RequestBuilder) AsyncHead(url string, f func(*Response)) {
-	go doAsyncRequest(rb.Head(url), f)
+func (rb *RequestBuilder) AsyncHead(url string, queryString ...Query) <-chan *Response {
+	return doAsync(rb.Head, url, queryString...)
 }
 
 // AsyncOptions is the *asynchronous* option for OPTIONS.
 // The go routine calling AsyncOptions(), will not be blocked.
 //
 // Whenever the Response is ready, the *f* function will be called back.
-func (rb *RequestBuilder) AsyncOptions(url string, f func(*Response)) {
-	go doAsyncRequest(rb.Options(url), f)
+func (rb *RequestBuilder) AsyncOptions(url string, queryString ...Query) <-chan *Response {
+	return doAsync(rb.Options, url, queryString...)
 }
 
-func doAsyncRequest(r *Response, f func(*Response)) {
-	f(r)
+func doAsync(f func(string, ...Query) *Response, url string, queryString ...Query) <-chan *Response {
+
+	c := make(chan *Response, 1)
+
+	go func() {
+		r := f(url, queryString...)
+		c <- r
+	}()
+
+	return c
+}
+
+func doAsyncWithBody(f func(string, interface{}, ...Query) *Response,
+	url string, body interface{}, queryString ...Query) <-chan *Response {
+
+	c := make(chan *Response, 1)
+
+	go func() {
+		r := f(url, body, queryString...)
+		c <- r
+	}()
+
+	return c
 }
 
 // ForkJoin let you *fork* requests, and *wait* until all of them have return.
@@ -237,18 +262,34 @@ func doAsyncRequest(r *Response, f func(*Response)) {
 //	fmt.Println(futureA.Response())
 //	fmt.Println(futureB.Response())
 //
-func (rb *RequestBuilder) ForkJoin(f func(*Concurrent)) {
+func (rb *RequestBuilder) ForkJoin(f func(*Concurrent)) <-chan *Response {
 
 	c := new(Concurrent)
 	c.reqBuilder = rb
 
 	f(c)
 
-	c.wg.Add(c.list.Len())
+	count := c.list.Len()
+	c.wg.Add(count)
 
+	// Fork
 	for e := c.list.Front(); e != nil; e = e.Next() {
-		go e.Value.(func())()
+		future := e.Value.(*FutureResponse)
+		go future.exec()
 	}
 
+	// Wait
 	c.wg.Wait()
+
+	// Join
+	join := make(chan *Response, count)
+
+	for e := c.list.Front(); e != nil; e = e.Next() {
+		future := e.Value.(*FutureResponse)
+		join <- future.Response()
+	}
+
+	close(join)
+
+	return join
 }

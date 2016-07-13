@@ -14,7 +14,8 @@ import (
 // FutureResponse will never be nil, and has a Response function for getting the
 // Response, that will be nil after the ForkJoin operation is completed
 type FutureResponse struct {
-	p unsafe.Pointer
+	p    unsafe.Pointer
+	exec func()
 }
 
 // Response gives you the Response of a Request,after the ForkJoin operation
@@ -122,15 +123,15 @@ func (c *Concurrent) Options(url string) *FutureResponse {
 
 func (c *Concurrent) doRequest(verb string, url string, reqBody interface{}) *FutureResponse {
 
-	fr := new(FutureResponse)
+	future := new(FutureResponse)
 
-	future := func() {
+	future.exec = func() {
 		defer c.wg.Done()
 		r := c.reqBuilder.doRequest(verb, url, reqBody)
-		atomic.StorePointer(&fr.p, unsafe.Pointer(r))
+		atomic.StorePointer(&future.p, unsafe.Pointer(r))
 	}
 
 	c.list.PushBack(future)
 
-	return fr
+	return future
 }

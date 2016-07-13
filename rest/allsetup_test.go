@@ -17,7 +17,7 @@ import (
 var lastModifiedDate = time.Now()
 
 type User struct {
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -47,7 +47,7 @@ func setup() {
 
 	users = make([]User, len(userList))
 	for i, n := range userList {
-		users[i] = User{Id: i + 1, Name: n}
+		users[i] = User{ID: i + 1, Name: n}
 	}
 
 	//users
@@ -188,7 +188,7 @@ func usersXML(writer http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		u.Id = 3
+		u.ID = 3
 		ub, _ := json.Marshal(u)
 
 		writer.Header().Set("Content-Type", "application/xml")
@@ -260,7 +260,7 @@ func allUsers(writer http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		u.Id = 3
+		u.ID = 3
 		ub, _ := json.Marshal(u)
 
 		writer.Header().Set("Content-Type", "application/json")
