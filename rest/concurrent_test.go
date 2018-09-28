@@ -43,20 +43,24 @@ func TestSlowForkJoinGet(t *testing.T) {
 
 	var f [100]*FutureResponse
 
-	for x := 0; x < 50; x++ {
-
-		rb.ForkJoin(func(cr *Concurrent) {
-			for i := range f {
-				f[i] = cr.Get("/slow/user")
-			}
-		})
-
+	//for x := 0; x < 50; x++ {
+	rb.ForkJoin(func(cr *Concurrent) {
 		for i := range f {
-			if f[i].Response().StatusCode != http.StatusOK {
-				t.Fatal("f[" + strconv.Itoa(i) + "] Status != OK (200)")
-			}
+			f[i] = cr.Get("/slow/user")
+		}
+	})
+
+	for i := range f {
+
+		if f[i].Response().Err != nil {
+			println(f[i].Response().Err.Error())
 		}
 
+		if f[i].Response().StatusCode != http.StatusOK {
+			t.Fatal("f[" + strconv.Itoa(i) + "] Status != OK (200)")
+		}
 	}
+
+	//}
 
 }

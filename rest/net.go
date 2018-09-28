@@ -154,7 +154,8 @@ func (rb *RequestBuilder) getClient() *http.Client {
 			if defaultTransport == nil {
 				defaultTransport = &http.Transport{
 					MaxIdleConnsPerHost: DefaultMaxIdleConnsPerHost,
-					Proxy:               http.ProxyFromEnvironment}
+					Proxy:               http.ProxyFromEnvironment,
+				}
 			}
 		})
 		///////

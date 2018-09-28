@@ -174,6 +174,6 @@ func AsyncOptions(url string, queryString ...Query) <-chan *Response {
 //	fmt.Println(futureB.Response())
 //
 // AsyncOptions uses the DefaultBuilder
-func ForkJoin(f func(*Concurrent)) {
-	dfltBuilder.ForkJoin(f)
+func ForkJoin(f func(*Concurrent)) <-chan *Response {
+	return dfltBuilder.ForkJoin(f)
 }

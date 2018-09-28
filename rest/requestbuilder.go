@@ -55,7 +55,7 @@ type RequestBuilder struct {
 	// Disable internal caching of Responses
 	DisableCache bool
 
-	// Disable timeout and deafult timeout = no timeout
+	// Disable timeout and default timeout = no timeout
 	DisableTimeout bool
 
 	// Create a CustomPool if you don't want to share the *transport*, with others
@@ -169,7 +169,7 @@ func (rb *RequestBuilder) Options(url string, queryString ...Query) *Response {
 //
 // Whenever the Response is ready, the *f* function will be called back.
 func (rb *RequestBuilder) AsyncGet(url string, queryString ...Query) <-chan *Response {
-	return doAsync(rb.Get, url, queryString...)
+	return doAsync(rb.Get, false, url, nil, queryString...)
 }
 
 // AsyncPost is the *asynchronous* option for POST.
@@ -177,7 +177,7 @@ func (rb *RequestBuilder) AsyncGet(url string, queryString ...Query) <-chan *Res
 //
 // Whenever the Response is ready, the *f* function will be called back.
 func (rb *RequestBuilder) AsyncPost(url string, body interface{}, queryString ...Query) <-chan *Response {
-	return doAsyncWithBody(rb.Post, url, body, queryString...)
+	return doAsync(rb.Post, true, url, body, queryString...)
 }
 
 // AsyncPut is the *asynchronous* option for PUT.
@@ -185,7 +185,7 @@ func (rb *RequestBuilder) AsyncPost(url string, body interface{}, queryString ..
 //
 // Whenever the Response is ready, the *f* function will be called back.
 func (rb *RequestBuilder) AsyncPut(url string, body interface{}, queryString ...Query) <-chan *Response {
-	return doAsyncWithBody(rb.Put, url, body, queryString...)
+	return doAsync(rb.Put, true, url, body, queryString...)
 }
 
 // AsyncPatch is the *asynchronous* option for PATCH.
@@ -193,7 +193,7 @@ func (rb *RequestBuilder) AsyncPut(url string, body interface{}, queryString ...
 //
 // Whenever the Response is ready, the *f* function will be called back.
 func (rb *RequestBuilder) AsyncPatch(url string, body interface{}, queryString ...Query) <-chan *Response {
-	return doAsyncWithBody(rb.Patch, url, body, queryString...)
+	return doAsync(rb.Patch, true, url, body, queryString...)
 }
 
 // AsyncDelete is the *asynchronous* option for DELETE.
@@ -201,7 +201,7 @@ func (rb *RequestBuilder) AsyncPatch(url string, body interface{}, queryString .
 //
 // Whenever the Response is ready, the *f* function will be called back.
 func (rb *RequestBuilder) AsyncDelete(url string, queryString ...Query) <-chan *Response {
-	return doAsync(rb.Delete, url, queryString...)
+	return doAsync(rb.Delete, false, url, nil, queryString...)
 }
 
 // AsyncHead is the *asynchronous* option for HEAD.
@@ -209,7 +209,7 @@ func (rb *RequestBuilder) AsyncDelete(url string, queryString ...Query) <-chan *
 //
 // Whenever the Response is ready, the *f* function will be called back.
 func (rb *RequestBuilder) AsyncHead(url string, queryString ...Query) <-chan *Response {
-	return doAsync(rb.Head, url, queryString...)
+	return doAsync(rb.Head, false, url, nil, queryString...)
 }
 
 // AsyncOptions is the *asynchronous* option for OPTIONS.
@@ -217,29 +217,25 @@ func (rb *RequestBuilder) AsyncHead(url string, queryString ...Query) <-chan *Re
 //
 // Whenever the Response is ready, the *f* function will be called back.
 func (rb *RequestBuilder) AsyncOptions(url string, queryString ...Query) <-chan *Response {
-	return doAsync(rb.Options, url, queryString...)
+	return doAsync(rb.Options, false, url, nil, queryString...)
 }
 
-func doAsync(f func(string, ...Query) *Response, url string, queryString ...Query) <-chan *Response {
+func doAsync(f interface{}, withBody bool, url string, body interface{}, queryString ...Query) <-chan *Response {
 
 	c := make(chan *Response, 1)
 
 	go func() {
-		r := f(url, queryString...)
+
+		var r *Response
+
+		if withBody {
+			r = f.(func(string, interface{}, ...Query) *Response)(url, body, queryString...)
+		} else {
+			r = f.(func(string, ...Query) *Response)(url, queryString...)
+		}
+
 		c <- r
-	}()
 
-	return c
-}
-
-func doAsyncWithBody(f func(string, interface{}, ...Query) *Response,
-	url string, body interface{}, queryString ...Query) <-chan *Response {
-
-	c := make(chan *Response, 1)
-
-	go func() {
-		r := f(url, body, queryString...)
-		c <- r
 	}()
 
 	return c

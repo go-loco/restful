@@ -3,6 +3,7 @@ package rest
 import (
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestGet(t *testing.T) {
@@ -106,6 +107,8 @@ func TestAsyncHead(t *testing.T) {
 
 	r := <-AsyncHead(server.URL + "/user")
 
+	time.Sleep(50 * time.Millisecond)
+
 	if r.StatusCode != http.StatusOK {
 		t.Fatal("Status != OK (200)")
 	}
@@ -115,6 +118,8 @@ func TestAsyncHead(t *testing.T) {
 func TestAsyncPost(t *testing.T) {
 
 	r := <-AsyncPost(server.URL+"/user", &User{Name: "Matilda"})
+
+	time.Sleep(50 * time.Millisecond)
 
 	if r.StatusCode != http.StatusCreated {
 		t.Fatal("Status != OK (201)")
@@ -126,6 +131,8 @@ func TestAsyncPut(t *testing.T) {
 
 	r := <-AsyncPut(server.URL+"/user/3", &User{Name: "Pichucha"})
 
+	time.Sleep(50 * time.Millisecond)
+
 	if r.StatusCode != http.StatusOK {
 		t.Fatal("Status != OK (200)")
 	}
@@ -135,6 +142,8 @@ func TestAsyncPut(t *testing.T) {
 func TestAsyncPatch(t *testing.T) {
 
 	r := <-AsyncPatch(server.URL+"/user/3", &User{Name: "Pichucha"})
+
+	time.Sleep(50 * time.Millisecond)
 
 	if r.StatusCode != http.StatusOK {
 		t.Fatal("Status != OK (200)")
@@ -146,6 +155,8 @@ func TestAsyncDelete(t *testing.T) {
 
 	r := <-AsyncDelete(server.URL + "/user/4")
 
+	time.Sleep(50 * time.Millisecond)
+
 	if r.StatusCode != http.StatusOK {
 		t.Fatal("Status != OK (200)")
 	}
@@ -155,6 +166,8 @@ func TestAsyncDelete(t *testing.T) {
 func TestAsyncOptions(t *testing.T) {
 
 	r := <-AsyncOptions(server.URL + "/user")
+
+	time.Sleep(50 * time.Millisecond)
 
 	if r.StatusCode != http.StatusOK {
 		t.Fatal("Status != OK (200)")
